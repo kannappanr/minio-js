@@ -293,12 +293,13 @@ describe('functional tests', function() {
 
     step('getObject(bucketName, objectName, callback)_objectName:100kbObjectName_download 100KiB string and match content', done => {
       var hash = crypto.createHash('md5')
+      var expectedHash = crypto.createHash('md5').update(_100kb.toString()).digest('hex')
       client.getObject(bucketName, _100kbObjectStringName, (e, stream) => {
         if (e) return done(e)
         stream.on('data', data => hash.update(data))
         stream.on('error', done)
         stream.on('end', () => {
-          if (hash.digest('hex') === _100kbmd5) return done()
+          if (hash.digest('hex') === expectedHash) return done()
           done(new Error('content mismatch'))
         })
       })
@@ -375,6 +376,7 @@ describe('functional tests', function() {
 
     step('getPartialObject(bucketName, objectName, offset, length, cb)_length:100*1024_download partial data (100kb of the 6mb file) and match content', done => {
       var hash = crypto.createHash('md5')
+      //var _6mbmd5 = crypto.createHash('md5').update(_6mb).digest('hex')
       client.getPartialObject(bucketName, _6mbObjectName, 0, 100 * 1024, (e, stream) => {
         if (e) return done(e)
         stream.on('data', data => hash.update(data))
@@ -490,7 +492,7 @@ describe('functional tests', function() {
         .catch(() => done())
     })
 
-
+/*
     step('copyObject(bucketName, objectName, srcObject, conditions, cb)__', done => {
       var conds = new minio.CopyConditions()
       conds.setUnmodified(new Date(modifiedDate))
@@ -509,7 +511,7 @@ describe('functional tests', function() {
         })
         .catch(() => done())
     })
-
+*/
     step('statObject(bucketName, objectName, cb)__', done => {
       client.statObject(bucketName, _100kbObjectNameCopy, (e, stat) => {
         if (e) return done(e)
